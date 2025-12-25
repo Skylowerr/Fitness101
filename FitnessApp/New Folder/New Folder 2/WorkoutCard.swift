@@ -24,6 +24,8 @@ struct WorkoutCard: View {
             VStack{
                 HStack{
                     Text(workout.title)
+                        .lineLimit(1) //1 satıra sıkıştır
+                        .minimumScaleFactor(0.5) // bu kadar düşebilir
                         .font(.title3)
                         .bold()
                     

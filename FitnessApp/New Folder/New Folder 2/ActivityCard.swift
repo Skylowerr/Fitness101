@@ -16,9 +16,11 @@ struct ActivityCard: View {
                 .cornerRadius(15)
             
             VStack{
-                HStack(alignment: .center){ //Image'ı yukarı taşır. Yoksa Textlerin arasında kalıyor
+                HStack(alignment: .top){ //Image'ı yukarı taşır. Yoksa Textlerin arasında kalıyor
                     VStack(alignment: .leading, spacing: 8){
                         Text(activity.title)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                         
                         Text(activity.subtitle)
                             .font(.caption)

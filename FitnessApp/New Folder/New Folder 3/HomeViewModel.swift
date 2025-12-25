@@ -8,9 +8,10 @@
 import Foundation
 
 class HomeViewModel: ObservableObject{
-     var calories : Int = 123
-     var active : Int = 123
-     var stand : Int = 8
+     let healthManager = HealthManager.shared
+     @Published var calories : Int = 123
+     @Published var exercise : Int = 123 //TODO: exercise
+     @Published var stand : Int = 8
 
     //Burası değişirse alttaki stateObject de değişsin diye @Published diyoruz
     @Published var mockActivities = [
@@ -35,5 +36,58 @@ class HomeViewModel: ObservableObject{
         
         
     ]
+    
+    init(){
+        Task{
+            do{
+                try await healthManager.requestHealthKitAccess()
+                fetchTodayCalories()
+                fetchTodayExerciseTime()
+                fetchTodayStandHours()
+
+            }catch{
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    func fetchTodayCalories(){
+        healthManager.fetchTodayCaloriesBurned { result in
+            switch result {
+            case .success(let calories):
+                DispatchQueue.main.async {
+                    self.stand = Int(calories)
+                }
+            case .failure(let failure):
+                print(failure)
+            }
+        }
+    }
+    
+    func fetchTodayExerciseTime(){
+        healthManager.fetchTodayExerciseTime { result in
+            switch result {
+            case .success(let exercise):
+                DispatchQueue.main.async {
+                    self.stand = Int(exercise)
+                }
+            case .failure(let failure):
+                print(failure)
+            }
+        }
+    }
+    
+    func fetchTodayStandHours(){
+        healthManager.fetchTodayStandHours { result in
+            switch result {
+            case .success(let hours):
+                DispatchQueue.main.async {
+                    self.stand = hours
+                }
+            case .failure(let failure):
+                print(failure)
+            }
+        }
+    }
     
 }
