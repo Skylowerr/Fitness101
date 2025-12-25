@@ -17,6 +17,7 @@ struct ProgressCircleView: View {
     
     
     var body: some View {
+        //MARK: CircleBar CodeSnippet
         ZStack{
             Circle()
                 .stroke(color.opacity(0.3), lineWidth: width) //içini boşaltıyor.
