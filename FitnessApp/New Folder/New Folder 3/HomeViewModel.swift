@@ -12,6 +12,8 @@ class HomeViewModel: ObservableObject{
      @Published var calories : Int = 123
      @Published var exercise : Int = 123 //TODO: exercise
      @Published var stand : Int = 8
+    
+    @Published var activities = [Activity]() //TODO: () ne oluyor? Inıtializes as an empty array?
 
     //Burası değişirse alttaki stateObject de değişsin diye @Published diyoruz
     @Published var mockActivities = [
@@ -44,6 +46,8 @@ class HomeViewModel: ObservableObject{
                 fetchTodayCalories()
                 fetchTodayExerciseTime()
                 fetchTodayStandHours()
+                fetchTodaysSteps()
+                fetchCurrentWeekActivities()
 
             }catch{
                 print(error.localizedDescription)
@@ -57,9 +61,11 @@ class HomeViewModel: ObservableObject{
             case .success(let calories):
                 DispatchQueue.main.async {
                     self.stand = Int(calories)
+                    let activity = Activity(title: "Calories Burned", subtitle: "Today", image: "flame", tintColor: .red, amount: calories.formattedNumberString())
+                    self.activities.append(activity)
                 }
             case .failure(let failure):
-                print(failure)
+                print(failure.localizedDescription)
             }
         }
     }
@@ -72,7 +78,7 @@ class HomeViewModel: ObservableObject{
                     self.stand = Int(exercise)
                 }
             case .failure(let failure):
-                print(failure)
+                print(failure.localizedDescription)
             }
         }
     }
@@ -85,7 +91,34 @@ class HomeViewModel: ObservableObject{
                     self.stand = hours
                 }
             case .failure(let failure):
-                print(failure)
+                print(failure.localizedDescription)
+            }
+        }
+    }
+    
+    //MARK: Fitness Activity
+    func fetchTodaysSteps(){
+        healthManager.fetchTodaySteps { result in
+            switch result {
+            case .success(let activity):
+                DispatchQueue.main.async {
+                    self.activities.append(activity)
+                }
+            case .failure(let failure):
+                print(failure.localizedDescription)
+            }
+        }
+    }
+    
+    func fetchCurrentWeekActivities(){
+        healthManager.fetchCurrentWeekWorkoutStats { result in
+            switch result {
+            case .success(let activities):
+                DispatchQueue.main.async {
+                    self.activities.append(contentsOf: activities)
+                }
+            case .failure(let failure):
+                print(failure.localizedDescription)
             }
         }
     }

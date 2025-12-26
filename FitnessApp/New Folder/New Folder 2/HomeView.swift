@@ -94,13 +94,17 @@ struct HomeView: View {
                         }
                     }
                     .padding(.horizontal)
-                    //count: 2 olduğu için ekranınız yan yana 2 sütunlu bir yapıya sahip olur.
-                    LazyVGrid(columns: Array(repeating: GridItem(spacing:20), count: 2)) {
-                        ForEach(viewModel.mockActivities) { activity in
-                            ActivityCard(activity: activity)
+                    
+                    if !viewModel.activities.isEmpty{
+                        //count: 2 olduğu için ekranınız yan yana 2 sütunlu bir yapıya sahip olur.
+                        LazyVGrid(columns: Array(repeating: GridItem(spacing:20), count: 2)) {
+                            //TODO: mockData yazabilirsin
+                            ForEach(viewModel.activities) { activity in
+                                ActivityCard(activity: activity)
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                     
                     HStack{
                         Text("Recent Workouts")
