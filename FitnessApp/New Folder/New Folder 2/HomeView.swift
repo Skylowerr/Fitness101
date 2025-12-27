@@ -131,7 +131,7 @@ struct HomeView: View {
                     //LazyVGrid olmaz çünkü ızgara şeklinde bölmek istemiyorsun. Dikeyde sıralıyorsun
                     
                     LazyVStack{
-                        ForEach(viewModel.mockWorkouts) { workout in
+                        ForEach(viewModel.workouts, id: \.id) { workout in
                             WorkoutCard(workout: workout)
                         }
                     }

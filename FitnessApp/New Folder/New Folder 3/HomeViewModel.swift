@@ -16,6 +16,16 @@ class HomeViewModel: ObservableObject{
     @Published var activities = [Activity]() //TODO: () ne oluyor? Inıtializes as an empty array?
 
     //Burası değişirse alttaki stateObject de değişsin diye @Published diyoruz
+    @Published var workouts = [
+        Workout(title: "Running", image: "figure.run", duration: "12 mins", date: "Aug 1", calories: "122 kcal",tintColor: .green),
+        
+        Workout(title: "Walking", image: "figure.run", duration: "89 mins", date: "Aug 2", calories: "896 kcal",tintColor: .red),
+        
+        Workout(title: "Running", image: "figure.run", duration: "51 mins", date: "Aug 3", calories: "522 kcal",tintColor: .blue),
+        
+        Workout(title: "Running", image: "figure.run", duration: "5 mins", date: "Aug 4", calories: "52 kcal",tintColor: .green)
+    ]
+    
     @Published var mockActivities = [
         
         Activity(title: "Today steps", subtitle: "Goal 12.000", image: "figure.walk", tintColor: .green, amount: "9.812"),
@@ -48,6 +58,7 @@ class HomeViewModel: ObservableObject{
                 fetchTodayStandHours()
                 fetchTodaysSteps()
                 fetchCurrentWeekActivities()
+                fetchRecentWorkouts()
 
             }catch{
                 print(error.localizedDescription)
@@ -123,4 +134,17 @@ class HomeViewModel: ObservableObject{
         }
     }
     
+    //MARK: Recent Workouts
+    func fetchRecentWorkouts(){
+        healthManager.fetchWorkoutsForMonth(month: Date()){result in
+            switch result {
+            case .success(let workouts):
+                DispatchQueue.main.async {
+                    self.workouts = Array(workouts.prefix(4)) //TODO: Max 4 tane oluyor sanırım?
+                }
+            case .failure(let failure):
+                print(failure.localizedDescription)
+            }
+        }
+    }
 }

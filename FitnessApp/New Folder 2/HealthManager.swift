@@ -20,6 +20,22 @@ extension Date{
         components.weekday = 2
         return calendar.date(from: components) ?? Date()
     }
+    
+    func fetchMonthStartDateEndDate() -> (Date,Date){
+        let calendar = Calendar.current
+        let startDateComponent = calendar.dateComponents([.year,.month], from: calendar.startOfDay(for: self))
+        let startDate = calendar.date(from: startDateComponent) ?? self
+        
+        let endDate = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startDate) ?? self
+        
+        return (startDate,endDate)
+    }
+    
+    func formatWorkoutDate() -> String{
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: self)
+    }
 }
 
 extension Double{
@@ -177,4 +193,25 @@ class HealthManager{
             Activity(title: "Kickboxing", subtitle: "This Week", image: "figure.kickboxing", tintColor: .green, amount: "\(kickboxing) mins")
         ]
     }
+    
+    //MARK: Recent Workouts
+    func fetchWorkoutsForMonth(month : Date ,completion : @escaping(Result<[Workout],Error>)-> Void){
+        let workouts = HKSampleType.workoutType()
+        let (startDate, endDate) = month.fetchMonthStartDateEndDate()
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate)
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        let query = HKSampleQuery(sampleType: workouts, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { _, results, error in
+            guard let workouts = results as? [HKWorkout], error == nil else {
+                completion(.failure(URLError(.badURL)))
+                return
+            }
+            
+            let workoutsArray = workouts.map({Workout(title: $0.workoutActivityType.name, image: $0.workoutActivityType.image, duration: "\(Int($0.duration)/60) mins", date: $0.startDate.formatWorkoutDate(), calories: ($0.totalEnergyBurned?.doubleValue(for: .kilocalorie()).formattedNumberString() ?? "-") + "kcal", tintColor: $0.workoutActivityType.color)})
+            completion(.success(workoutsArray))
+             
+        }
+        healthStore.execute(query)
+    }
+    
+    
 }
